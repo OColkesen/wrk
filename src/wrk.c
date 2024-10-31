@@ -229,11 +229,11 @@ void *thread_main(void *arg) {
     aeMain(loop);
 
     aeDeleteEventLoop(loop);
-    
-    connection *c = thread->cs;
+
+    c = thread->cs;
     for (uint64_t i = 0; i < thread->connections; i++, c++) {
         for (uint64_t j = 0; j < 30; j++) {
-            printf("Request time: start=%llu, end=%llu\n", c->request_times[j].start, c->request_times[j].end);
+            printf("Request time: start=%lu, end=%lu\n", c->request_times[j].start, c->request_times[j].end);
         }
     }
     zfree(thread->cs);
