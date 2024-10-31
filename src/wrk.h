@@ -61,6 +61,11 @@ typedef struct connection {
     buffer headers;
     buffer body;
     char buf[RECVBUF];
+    struct {
+        uint64_t start;
+        uint64_t end;
+    } request_times[30];
+    uint64_t request_count;
 } connection;
 
 #endif /* WRK_H */

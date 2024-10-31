@@ -218,6 +218,7 @@ void *thread_main(void *arg) {
         c->request = request;
         c->length  = length;
         c->delayed = cfg.delay;
+        c->request_count = 0;
         connect_socket(thread, c);
     }
 
@@ -228,6 +229,13 @@ void *thread_main(void *arg) {
     aeMain(loop);
 
     aeDeleteEventLoop(loop);
+    
+    connection *c = thread->cs;
+    for (uint64_t i = 0; i < thread->connections; i++, c++) {
+        for (uint64_t j = 0; j < 30; j++) {
+            printf("Request time: start=%llu, end=%llu\n", c->request_times[j].start, c->request_times[j].end);
+        }
+    }
     zfree(thread->cs);
 
     return NULL;
@@ -327,9 +335,15 @@ static int response_complete(http_parser *parser) {
     uint64_t now = time_us();
     int status = parser->status_code;
 
+    c->request_count++;
     thread->complete++;
     thread->requests++;
 
+    if (c->request_count % 10 == 0 && c->request_count < 30 * 10 + 1) {
+        c->request_times[c->request_count / 10].start = c->start;
+        c->request_times[c->request_count / 10].end = now;
+    }
+    
     if (status > 399) {
         thread->errors.status++;
     }
