@@ -233,7 +233,7 @@ void *thread_main(void *arg) {
     c = thread->cs;
     for (int i = 0; i < thread->connections; i++, c++) {
         printf("Connection: %d\n", i);
-        for (int j = 0; j < 20; j++) {
+        for (int j = 0; j < 30; j++) {
             printf("Request time: start=%lu, end=%lu\n", c->request_times[j].start, c->request_times[j].end);
         }
     }
@@ -340,8 +340,8 @@ static int response_complete(http_parser *parser) {
     thread->complete++;
     thread->requests++;
 
-    if (c->request_count % 10 == 0 && c->request_count < 20 * 10 + 1) {
-        c->request_times[c->request_count / 10].start = c->start;
+    if (c->request_count >= 5*10 && c->request_count % 10 == 0 && c->request_count < 35 * 10 + 1) {
+        c->request_times[(c->request_count - 5*10) / 10].start = c->start;
         c->request_times[c->request_count / 10].end = now;
     }
     
